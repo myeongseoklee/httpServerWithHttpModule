@@ -73,6 +73,7 @@ for (let i = 0; i < users.length; i++) {
   }
 }
 
+
 const http = require("http");
 const server = http.createServer();
 
@@ -110,6 +111,25 @@ const httpRequestListener = function (request, response) {
     if (url === '/data') {
       response.writeHead(200, { "content-Type": "application/json"});
       response.end(JSON.stringify({ data }));
+    }
+  } else if (method === "PATCH") {
+    let body ='';
+    if (url === '/posts') {
+      request.on('data',(data) => {body += data});
+      request.on('end', () => {
+        const patch = JSON.parse(body);
+        posts.forEach( item => {
+          if(item.id === patch.id) {
+            item.content = patch.content
+          }
+        });
+        data.forEach( item => {
+          if(item.postingId === patch.id) {
+            item.postingContent = patch.content
+          }
+        });
+        response.end(JSON.stringify({ data : data[patch.id-1] }))
+      });
     }
   }
 }
