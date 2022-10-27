@@ -67,7 +67,7 @@ for (let i = 0; i < users.length; i++) {
         postingId: posts[j].id,
         postingTitle: posts[j].title,
         postingImageUrl: posts[j].imageUrl,
-        postingContent: posts[j].content
+        postingContent: posts[j].content,
       })
     }
   }
@@ -129,6 +129,25 @@ const httpRequestListener = function (request, response) {
           }
         });
         response.end(JSON.stringify({ data : data[patch.id-1] }))
+      });
+    }
+  } else if (method === "DELETE") {
+    let body = ''
+    if (url === '/posts') {
+      request.on('data',(data) => {body += data});
+      request.on('end', () => {
+        const del = JSON.parse(body);
+        posts.forEach( item => {
+          if(item.id === del.id) {
+            delete item
+          }
+        });
+        data.forEach( item => {
+          if(item.postingId === del.id) {
+            delete item
+          }
+        });
+        response.end(JSON.stringify({ message : "postingDeleted" }));
       });
     }
   }
