@@ -38,14 +38,14 @@ const posts = [
     title: "HTTP의 특성",
     imageUrl: undefined,
     content: "Request/Response와 Stateless!!",
-    userId: 2,
+    userId: 1,
   },
   {
     id: 3,
     title: undefined,
     imageUrl: "내용 1",
     content: "sampleContent3",
-    userId: 3,
+    userId: 1,
   },
   {
     id: 4,
@@ -91,6 +91,7 @@ const httpRequestListener = function (request, response) {
           email: user.email,
           password: user.password
         });
+        response.writeHead(200, { "content-Type": "application/json"});
         response.end(JSON.stringify({message: 'userCreated'}));
       });
     } else if (url === "/posts") {
@@ -104,6 +105,7 @@ const httpRequestListener = function (request, response) {
           content: post.content,
           userId: post.userId
         });
+        response.writeHead(200, { "content-Type": "application/json"});
         response.end(JSON.stringify({message: 'postCreated'}))
       })
     }
@@ -111,7 +113,7 @@ const httpRequestListener = function (request, response) {
     if (url === '/data') {
       response.writeHead(200, { "content-Type": "application/json"});
       response.end(JSON.stringify({ data }));
-    }
+    } 
   } else if (method === "PATCH") {
     let body ='';
     if (url === '/posts') {
@@ -128,6 +130,7 @@ const httpRequestListener = function (request, response) {
             item.postingContent = patch.content
           }
         });
+        response.writeHead(200, { "content-Type": "application/json"});
         response.end(JSON.stringify({ data : data[patch.id-1] }))
       });
     }
@@ -137,16 +140,19 @@ const httpRequestListener = function (request, response) {
       request.on('data',(data) => {body += data});
       request.on('end', () => {
         const del = JSON.parse(body);
-        posts.forEach( item => {
-          if(item.id === del.id) {
-            delete item
-          }
-        });
-        data.forEach( item => {
-          if(item.postingId === del.id) {
-            delete item
-          }
-        });
+        posts.splice(del.id-1,1);
+        data.splice(del.id-1,1);
+        // posts.forEach( item => {
+        //   if(item.id === parseInt(del.id)) {
+        //     delete item
+        //   }
+        // });
+        // data.forEach( item => {
+        //   if(item.postingId === parseInt(del.id)) {
+        //     delete item
+        //   }
+        // });
+        response.writeHead(200, { "content-Type": "application/json"});
         response.end(JSON.stringify({ message : "postingDeleted" }));
       });
     }
