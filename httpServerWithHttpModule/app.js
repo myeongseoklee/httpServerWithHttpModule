@@ -56,6 +56,26 @@ const posts = [
   },
 ];
 
+// user별 posting 매치
+let userPostings = [];
+for (let i = 0; i < users.length; i++) {
+  userPostings.push({
+    userID: users[i].id,
+    userName: users[i].name,
+    postings: [],
+  })
+  for (let j = 0; j< posts.length; j++) {
+    if(userPostings[i].userID === posts[j].userId) {
+  userPostings[i].postings.push({
+    postingId: posts[j].id,
+    postingName: posts[j].title,
+    postingContent: posts[j].content,
+  })
+    }
+  }
+}
+
+
 // users와 posts 통합 테이블
 const data = [];
 for (let i = 0; i < users.length; i++) {
@@ -72,6 +92,8 @@ for (let i = 0; i < users.length; i++) {
     }
   }
 }
+
+
 
 
 const http = require("http");
@@ -113,7 +135,10 @@ const httpRequestListener = function (request, response) {
     if (url === '/data') {
       response.writeHead(200, { "content-Type": "application/json"});
       response.end(JSON.stringify({ data }));
-    } 
+    } else if (url === '/postings') {
+      response.writeHead(200, { "content-Type": "application/json"});
+      response.end(JSON.stringify({ userPostings }));
+    }
   } else if (method === "PATCH") {
     let body ='';
     if (url === '/posts') {
